@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgr
+    username: root
+    password: '123'
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  freemarker:
+    expose-request-attributes: true
+logging:
+  level:
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+cxf:
+  path: /Service
