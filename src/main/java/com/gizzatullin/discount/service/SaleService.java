@@ -62,7 +62,7 @@ public class SaleService {
 
 		}
 		sale.setItems(salePositions);
-		Optional<Sale> lastSalesOptional = saleRepository.findFirstByIdOrderByIdDesc();
+		Optional<Sale> lastSalesOptional = saleRepository.findFirstByOrderByIdDesc();
 		String receiptNumber = "00100";
 		if (lastSalesOptional.isPresent()){
 			Sale lastSales = lastSalesOptional.get();
