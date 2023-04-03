@@ -5,6 +5,7 @@ import com.gizzatullin.discount.dao.ProductRepository;
 import com.gizzatullin.discount.model.HourDiscount;
 import com.gizzatullin.discount.model.product.Product;
 import com.gizzatullin.discount.model.product.ProductInfo;
+import com.gizzatullin.discount.model.product.ProductRating;
 import com.gizzatullin.discount.model.product.ProductStatistic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,8 @@ public class ProductService {
 			productInfo.setDescription(product.getDescription());
 			productInfo.setRating(product.getAverageRating());
 			productInfo.setEstimates(product.getPairRating());
-			productInfo.setCurrentEstimate(product.getLastRating());
+			List<ProductRating> ratings = product.getRatings();
+			productInfo.setCurrentEstimate(ratings.get(ratings.size()-1).getRating());
 			return productInfo;
 		} else {
 			return null;
@@ -55,7 +57,7 @@ public class ProductService {
 
 				if (byProductIdOrderByEndDiscount.isPresent()) {
 					amount = amount
-							.multiply(BigDecimal.valueOf(100 / byProductIdOrderByEndDiscount.get().getPercentDiscount()));
+							.multiply(BigDecimal.valueOf(1 - 0.01 * byProductIdOrderByEndDiscount.get().getPercentDiscount()));
 				}
 			}
 		}

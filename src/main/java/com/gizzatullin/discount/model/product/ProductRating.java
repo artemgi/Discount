@@ -1,5 +1,7 @@
 package com.gizzatullin.discount.model.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.gizzatullin.discount.model.client.Client;
 import lombok.Data;
 
@@ -15,7 +17,8 @@ public class ProductRating {
 	private Integer rating;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "client_id")
+	@JoinColumn(name = "client_id", nullable = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer"})
 	private Client client;
 
 	@ManyToOne(fetch = FetchType.LAZY)

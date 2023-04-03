@@ -1,5 +1,7 @@
 package com.gizzatullin.discount.model.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -24,8 +26,10 @@ public class Product {
 	private String description;
 
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductRating> ratings = new ArrayList<>();
+	@JsonIgnore
+	private List<ProductRating> ratings;
 
+	@JsonIgnore
 	public BigDecimal getAverageRating(){
 		OptionalDouble average = ratings.stream().mapToInt(ProductRating::getRating).average();
 		if (average.isPresent()) {
@@ -36,6 +40,7 @@ public class Product {
 		}
 	}
 
+	@JsonIgnore
 	public Map<Integer, Integer> getPairRating(){
 		Map<Integer, Integer> pairRating= new java.util.HashMap<>(Map.of(
 				1, 0,
@@ -47,7 +52,4 @@ public class Product {
 		return pairRating;
 	}
 
-	public Integer getLastRating(){
-		return ratings.get(ratings.size()-1).getRating();
-	}
 }

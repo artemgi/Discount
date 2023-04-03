@@ -29,10 +29,11 @@ public class SaleService {
 	private final ClientRepository clientRepository;
 	private final ProductRepository productRepository;
 	private final HourDiscountRepository hourDiscountRepository;
+
 	public String registrationSale(Map<String, String> items, String totalCost) throws SaleRegistrationException {
 		Sale sale = new Sale();
 		Optional<Client> clientOptional = clientRepository.findByName(CLIENT_DEFAULT);
-		if (clientOptional.isPresent()){
+		if (clientOptional.isPresent()) {
 			sale.setClient(clientOptional.get());
 		} else {
 			Client client = new Client();
@@ -41,16 +42,16 @@ public class SaleService {
 		}
 		sale.setSaleDate(LocalDateTime.now());
 		List<SalePosition> salePositions = new ArrayList<>();
-		for (Map.Entry<String, String> product: items.entrySet()){
+		for (Map.Entry<String, String> product : items.entrySet()) {
 			Optional<Product> productOptional = productRepository.findById(Long.valueOf(product.getKey()));
-			if (productOptional.isPresent()){
+			if (productOptional.isPresent()) {
 				Product foundProduct = productOptional.get();
 				Integer quantity = Integer.valueOf(product.getValue());
 				SalePosition salePosition = new SalePosition();
 				salePosition.setProduct(foundProduct);
 				salePosition.setQuantity(quantity);
 				salePosition.setInitialPrice(foundProduct.getPrice());
-				if (!BigDecimal.valueOf(Long.parseLong(totalCost)).equals(getFinalPrice(foundProduct, quantity))){
+				if (BigDecimal.valueOf(Double.parseDouble(totalCost)).compareTo(getFinalPrice(foundProduct, quantity)) != 0) {
 					throw new SaleRegistrationException("Итоговая стоимость не соответствует рассчитанной на момент регистрации продажи");
 				}
 				salePosition.setFinalPrice(new BigDecimal(0));
@@ -64,9 +65,9 @@ public class SaleService {
 		sale.setItems(salePositions);
 		Optional<Sale> lastSalesOptional = saleRepository.findFirstByOrderByIdDesc();
 		String receiptNumber = "00100";
-		if (lastSalesOptional.isPresent()){
+		if (lastSalesOptional.isPresent()) {
 			Sale lastSales = lastSalesOptional.get();
-			if (lastSales.getSaleDate().toLocalDate().equals(LocalDate.now())){
+			if (lastSales.getSaleDate().toLocalDate().equals(LocalDate.now())) {
 				receiptNumber = incriminateStringReceipt(lastSales.getReceiptNumber());
 			}
 		}
@@ -75,7 +76,7 @@ public class SaleService {
 		return sale.getReceiptNumber();
 	}
 
-	public BigDecimal getFinalPrice(Product product, Integer quantityProducts){
+	public BigDecimal getFinalPrice(Product product, Integer quantityProducts) {
 		Optional<HourDiscount> byProductIdOrderByEndDiscount = hourDiscountRepository.findDiscountHours(product.getId());
 		BigDecimal amount = new BigDecimal(0);
 		amount = amount
@@ -84,11 +85,12 @@ public class SaleService {
 
 		if (byProductIdOrderByEndDiscount.isPresent()) {
 			amount = amount
-					.multiply(BigDecimal.valueOf(100 / byProductIdOrderByEndDiscount.get().getPercentDiscount()));
+					.multiply(BigDecimal.valueOf(1 - 0.01 * byProductIdOrderByEndDiscount.get().getPercentDiscount()));
 		}
 		return amount;
 	}
-	public String incriminateStringReceipt(String receipt){
+
+	public String incriminateStringReceipt(String receipt) {
 		DecimalFormat df = new DecimalFormat("00000");
 		int number = Integer.parseInt(receipt);
 		number++;
