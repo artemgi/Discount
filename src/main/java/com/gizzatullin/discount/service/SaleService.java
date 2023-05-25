@@ -10,6 +10,7 @@ import com.gizzatullin.discount.model.client.Client;
 import com.gizzatullin.discount.model.product.Product;
 import com.gizzatullin.discount.model.sale.Sale;
 import com.gizzatullin.discount.model.sale.SalePosition;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class SaleService {
 	static final String CLIENT_DEFAULT = "artem";
@@ -77,15 +78,15 @@ public class SaleService {
 	}
 
 	public BigDecimal getFinalPrice(Product product, Integer quantityProducts) {
-		Optional<HourDiscount> byProductIdOrderByEndDiscount = hourDiscountRepository.findDiscountHours(product.getId());
+		Optional<HourDiscount> hourDiscount = hourDiscountRepository.findDiscountHours(product.getId());
 		BigDecimal amount = new BigDecimal(0);
 		amount = amount
 				.add(product.getPrice()
 						.multiply(BigDecimal.valueOf(quantityProducts)));
 
-		if (byProductIdOrderByEndDiscount.isPresent()) {
+		if (hourDiscount.isPresent()) {
 			amount = amount
-					.multiply(BigDecimal.valueOf(1 - 0.01 * byProductIdOrderByEndDiscount.get().getPercentDiscount()));
+					.multiply(BigDecimal.valueOf(1 - 0.01 * hourDiscount.get().getPercentDiscount()));
 		}
 		return amount;
 	}
